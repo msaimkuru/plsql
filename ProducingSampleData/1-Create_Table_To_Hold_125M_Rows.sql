@@ -1,0 +1,19 @@
+CREATE TABLE SAIMK.TRASHBIGDATA(
+  id NUMBER,
+  text VARCHAR2(100),
+  country VARCHAR2(100),
+  Alpha_2_Country_Code VARCHAR2(2),
+  Alpha_3_Country_Code VARCHAR2(3),
+  Numeric_Country_Code NUMBER,
+  group1 NUMBER,
+  group2 NUMBER,
+  group3 NUMBER,
+  group4 NUMBER,
+  group5 NUMBER,
+  additional_data VARCHAR2(20)
+ );
+ 
+
+GRANT SELECT ON SAIMK.TRASHBIGDATA TO PUBLIC;
+
+SELECT * FROM  SAIMK.TRASHBIGDATA;
