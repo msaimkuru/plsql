@@ -1,3 +1,14 @@
+/*
+ * Exercise 4 on https://livesql.oracle.com/apex/f?p=590:1:4704207031745:CLEAR::1:TUTORIAL_ID,P1_SHOW_LEARN_SIDEBAR:182241645422959190146194127811898911783,Y
+ * 
+ * An anonymous block that deletes all the rows in the employees table for 
+ * department 10 and returns all the employee NOs and the employee names of 
+ * deleted rows. 
+ * 
+ * Then displays those values using DBMS_OUTPUT.PUT_LINE. 
+ * Finally, rollbacks.
+ */
+
 DECLARE
    TYPE t_rec IS RECORD(empno SAIMK.emp.empno%TYPE,
                         ename SAIMK.emp.ename%TYPE
