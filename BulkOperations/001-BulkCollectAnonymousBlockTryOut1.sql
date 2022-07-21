@@ -78,9 +78,18 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('l_cnt_bulk-->'||l_cnt_bulk);
     DBMS_OUTPUT.PUT_LINE(' l_cnt_for-->'||l_cnt_for);
     --
-    DBMS_OUTPUT.PUT_LINE(LPAD('For Loop Cursor Operation Time-->'||SAIMK.f_get_elapsed_time(t1,t2), 104, ' '));
-    DBMS_OUTPUT.PUT_LINE(LPAD('Bulk Collect Operation Time (FETCH LIMIT: NO FETCH LIMIT)-->'||SAIMK.f_get_elapsed_time(t3,t4), 104, ' '));
+    DBMS_OUTPUT.PUT_LINE(LPAD('For Loop Cursor Operation Time-->'||SAIMK.f_get_elapsed_time(t1, t2, NULL), 104, ' '));
+    DBMS_OUTPUT.PUT_LINE(LPAD('Bulk Collect Operation Time (FETCH LIMIT: NO FETCH LIMIT)-->'||SAIMK.f_get_elapsed_time(t3, t4, NULL), 104, ' '));
     DBMS_OUTPUT.PUT_LINE('---------------------------------------------------------------------------');
     --
 END;
-/
+
+/*
+ * SAMPLE OUTPUT:
+------------------------------ R E S U L T S ------------------------------
+l_cnt_bulk-->500000
+ l_cnt_for-->500000
+                                             For Loop Cursor Operation Time-->+000000 00:00:07.442000000
+                  Bulk Collect Operation Time (FETCH LIMIT: NO FETCH LIMIT)-->+000000 00:00:07.117000000
+---------------------------------------------------------------------------
+ */
