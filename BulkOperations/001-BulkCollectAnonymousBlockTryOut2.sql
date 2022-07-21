@@ -51,6 +51,7 @@ DECLARE
             --
         END LOOP;
         --
+        CLOSE C1;
     END show_trashbigdata_bulk;
     --
     --
@@ -86,8 +87,8 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('l_cnt_bulk-->'||l_cnt_bulk);
     DBMS_OUTPUT.PUT_LINE(' l_cnt_for-->'||l_cnt_for);
     --
-    DBMS_OUTPUT.PUT_LINE(LPAD('For Loop Cursor Operation Time-->'||SAIMK.f_get_elapsed_time(t1,t2), 104, ' '));
-    DBMS_OUTPUT.PUT_LINE(LPAD('Bulk Collect Operation Time (FETCH LIMIT:'||TO_CHAR(C_BULK_COLLECT_FETCH_LIMIT,'999G999G999G999')||')-->'||SAIMK.f_get_elapsed_time(t3,t4), 104, ' '));
+    DBMS_OUTPUT.PUT_LINE(LPAD('For Loop Cursor Operation Time-->'||SAIMK.f_get_elapsed_time(t1, t2, NULL), 104, ' '));
+    DBMS_OUTPUT.PUT_LINE(LPAD('Bulk Collect Operation Time (FETCH LIMIT:'||TO_CHAR(C_BULK_COLLECT_FETCH_LIMIT,'999G999G999G999')||')-->'||SAIMK.f_get_elapsed_time(t3, t4, NULL), 104, ' '));
     DBMS_OUTPUT.PUT_LINE('---------------------------------------------------------------------------');
     --
 END;
