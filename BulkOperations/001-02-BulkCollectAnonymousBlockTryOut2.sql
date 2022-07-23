@@ -1,5 +1,8 @@
-/* Bulk CollectOperation Sample With LIMIT*/
---select * from saimk.trashbigdata;
+/* 
+ * Bulk Collect Operation Sample With LIMIT
+ *
+ * select * from saimk.trashbigdata;
+ */
 DECLARE
     --
     C_BULK_COLLECT_FETCH_LIMIT CONSTANT NUMBER := 10000;
@@ -17,10 +20,6 @@ DECLARE
     SELECT t.*
     FROM saimk.trashbigdata t
     WHERE (cp_country IS NULL OR t.country = cp_country)
-    --AND t.GROUP1 = 1
-    --AND t.GROUP2 = 1
-    --AND t.GROUP3 = 1
-    --AND t.GROUP4 = 1
     ;    
     --
     PROCEDURE show_trashbigdata_bulk (
@@ -52,6 +51,7 @@ DECLARE
         END LOOP;
         --
         CLOSE C1;
+        --
     END show_trashbigdata_bulk;
     --
     --
