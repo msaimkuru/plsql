@@ -73,13 +73,13 @@ BEGIN
     --
     t1 := systimestamp;
     --
-    show_trashbigdata ('Albania'/*NULL*/);
+    show_trashbigdata ('Albania');
     --
     t2 := systimestamp;
     --
     t3 := systimestamp;
     --
-    show_trashbigdata_bulk ('Albania'/*NULL*/);
+    show_trashbigdata_bulk ('Albania');
     --
     t4 := systimestamp;
     --
