@@ -33,6 +33,6 @@
     SELECT ROWNUM, t.*
     FROM SAIMK.emp t
     ORDER BY sal DESC
-    FETCH FIRST 10 PERCENT ROWS ONLY
+    FETCH FIRST 15 PERCENT ROWS ONLY
     ;
 --------------------------------------------------------------------------------    
