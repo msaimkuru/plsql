@@ -1,0 +1,1 @@
+ALTER TABLE saimk.trashbigdata ADD CONSTRAINT PK_trashbigdata PRIMARY KEY(ID,COUNTRY);
