@@ -1,5 +1,8 @@
-/* Bulk CollectOperation Sample Without LIMIT*/
---select * from saimk.trashbigdata;
+/* 
+ * Bulk CollectOperation Sample Without LIMIT
+ *
+ * select * from saimk.trashbigdata;
+ */
 DECLARE
     --
     t1 TIMESTAMP; 
