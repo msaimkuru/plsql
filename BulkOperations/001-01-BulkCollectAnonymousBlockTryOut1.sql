@@ -1,5 +1,5 @@
 /* 
- * Bulk CollectOperation Sample Without LIMIT
+ * Bulk Collect Operation Sample Without LIMIT
  *
  * select * from saimk.trashbigdata;
  */
@@ -43,7 +43,7 @@ DECLARE
     IS
     BEGIN
         --
-        FOR II IN (SELECT ROWNUM indx, t.*
+        FOR II IN (SELECT t.*
                    FROM saimk.trashbigdata t
                    WHERE (pcountry IS NULL OR t.country = pcountry)
         )
