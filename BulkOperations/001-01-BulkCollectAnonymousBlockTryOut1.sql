@@ -23,10 +23,6 @@ DECLARE
         BULK COLLECT INTO l_trashbigdata_info
         FROM saimk.trashbigdata t
         WHERE (pcountry IS NULL OR t.country = pcountry)
-        --AND t.GROUP1 = 1
-        --AND t.GROUP2 = 1
-        --AND t.GROUP3 = 1
-        --AND t.GROUP4 = 1
         ;
         --
         FOR indx IN 1 .. l_trashbigdata_info.COUNT
@@ -47,10 +43,6 @@ DECLARE
         FOR II IN (SELECT ROWNUM indx, t.*
                    FROM saimk.trashbigdata t
                    WHERE (pcountry IS NULL OR t.country = pcountry)
-                   --AND t.GROUP1 = 1
-                   --AND t.GROUP2 = 1
-                   --AND t.GROUP3 = 1
-                   --AND GROUP4 = 1
         )
         LOOP
             --
@@ -64,13 +56,13 @@ BEGIN
     --
     t1 := systimestamp;
     --
-    show_trashbigdata ('Albania'/*NULL*/);
+    show_trashbigdata ('Albania');
     --
     t2 := systimestamp;
     --
     t3 := systimestamp;
     --
-    show_trashbigdata_bulk ('Albania'/*NULL*/);
+    show_trashbigdata_bulk ('Albania');
     --
     t4 := systimestamp;
     --
