@@ -1,9 +1,10 @@
 /* 
+ * -----------------------------------------------------------------------------
  * Resource: 
- * ---------
+ * -----------------------------------------------------------------------------
  * https://livesql.oracle.com/apex/livesql/file/tutorial_IEHP37S6LTWIIDQIR436SJ59L.html
  * -----------------------------------------------------------------------------
- * 4. Introduction to BULK COLLECT
+ * 4. Introduction to BULK COLLECT (Bulk processing for queries)
  * -----------------------------------------------------------------------------
  * To take advantage of bulk processing for queries, you simply put BULK COLLECT 
  * before the INTO keyword of your fetch operation, and then provide one or more 
@@ -11,24 +12,23 @@
  * ----------------------------------------------------------------------------
  * Here are some things to know about how BULK COLLECT works:
  * ----------------------------------------------------------------------------
- * It can be used with all three types of collections: associative arrays, 
+ * - It can be used with all three types of collections: associative arrays, 
  * nested tables, and VARRAYs.
  * 
- * You can fetch into individual collections (one for each expression in the 
+ * - You can fetch into individual collections (one for each expression in the 
  * SELECT list) or a single collection of records.
  *
- * The collection is always populated densely, starting from index value 1.
+ * - The collection is always populated densely, starting from index value 1.
  * 
- * If no rows are fetched, then the collection is emptied of all elements.
+ * - If no rows are fetched, then the collection is emptied of all elements.
  * ----------------------------------------------------------------------------
  * You can use BULK COLLECT in all these forms:
  * ----------------------------------------------------------------------------
-        1) SELECT column(s) BULK COLLECT INTO collection(s)
-        2) FETCH cursor BULK COLLECT INTO collection(s)
-        3) EXECUTE IMMEDIATE query_string BULK COLLECT INTO collection(s)
+ *       1) SELECT column(s) BULK COLLECT INTO collection(s) FROM ...
+ *       2) FETCH cursor BULK COLLECT INTO collection(s)
+ *       3) EXECUTE IMMEDIATE query_string BULK COLLECT INTO collection(s)
  * ----------------------------------------------------------------------------        
  */
- 
 /* 
  * ----------------------------------------------------------------------------
  * EXAMPLE 1:
@@ -36,21 +36,23 @@
  * Here's a block of code that fetches all rows in the employees table with a 
  * single context switch, and loads the data into a collection of records 
  * that are based on the table.
+ * ----------------------------------------------------------------------------
  */
 DECLARE
    TYPE employee_info_t IS TABLE OF saimk.employees%ROWTYPE;
-   l_employees   employee_info_t;
+   --
+   l_employees employee_info_t;
 BEGIN
-   SELECT v1.*
+   SELECT t.*
    BULK COLLECT 
    INTO l_employees
-   FROM saimk.employees v1
-   WHERE v1.department_id = 50
+   FROM saimk.employees t
    ;
-   DBMS_OUTPUT.PUT_LINE (l_employees.COUNT);
+   --
+   dbms_output.put_line (l_employees.COUNT);
 END
 ;
-
+/*----------------------------------------------------------------------------*/
 /*
  * If you do not want to retrieve all the columns in a table, create your own 
  * user-defined record type and use that to define your collection. All you have 
@@ -62,27 +64,28 @@ END
  */
 DECLARE
    TYPE two_cols_rt IS RECORD (
-      employee_id   saimk.employees.employee_id%TYPE,
-      salary        saimk.employees.salary%TYPE
+      employee_id saimk.employees.employee_id%TYPE,
+      salary saimk.employees.salary%TYPE
    );
-
+   --
    TYPE employee_info_t IS TABLE OF two_cols_rt;
-
+   --
    l_employees   employee_info_t;
 BEGIN
-   SELECT v1.employee_id, v1.salary
+   SELECT t.employee_id, t.salary
    BULK COLLECT
    INTO l_employees
-   FROM saimk.employees v1
-   WHERE v1.department_id = 50
+   FROM saimk.employees t
+   WHERE t.department_id = 50
    ;
-   DBMS_OUTPUT.PUT_LINE (l_employees.COUNT);
+   --
+   dbms_output.put_line (l_employees.COUNT);
 END
 ;
-
-/*
- * Quick Tip
- * 
+/*----------------------------------------------------------------------------*/
+/* ----------
+ * Quick Tip:
+ * ----------
  * You can avoid the nuisance of declaring a record type to serve as the type 
  * for the collection through the use of a "template cursor." This cursor should 
  * have the same select list as the BULK COLLECT query. You can, however, leave 
@@ -96,24 +99,25 @@ END
  */
 DECLARE
    CURSOR employee_info_c IS
-   SELECT v1.employee_id, v1.salary 
-   FROM saimk.employees v1
+   SELECT t.employee_id, t.salary 
+   FROM saimk.employees t
    ;
-
+   --
    TYPE employee_info_t IS TABLE OF employee_info_c%ROWTYPE;
-
-   l_employees   employee_info_t;
+   --
+   l_employees employee_info_t;
 BEGIN
-   SELECT v1.employee_id, v1.salary
+   SELECT t.employee_id, t.salary
    BULK COLLECT
    INTO l_employees
-   FROM saimk.employees v1
-   WHERE v1.department_id = 10
+   FROM saimk.employees t
+   WHERE t.department_id = 10
    ;
-   DBMS_OUTPUT.PUT_LINE (l_employees.COUNT);
+   --
+   dbms_output.put_line (l_employees.COUNT);
 END
 ;
-
+/*----------------------------------------------------------------------------*/
 /*
  * -----------------------------------------------------------------------------
  * Exercise 1
@@ -123,10 +127,15 @@ END
  * salary. Then write an anonymous block to run that procedure for department 
  * 100.
  * ----------------------------------------------------------------------------- 
- * Solution For Exercise 1
+ */
+/* 
+ * ----------------------------------------------------------------------------- 
+ * Solution For Exercise 1:
+ * -----------------------------------------------------------------------------
+ * We will also list last_name in addition to the actually wanted fields.
  * ----------------------------------------------------------------------------- 
  */
-CREATE OR REPLACE PROCEDURE p_list_employee_name_and_salary_by_department_id (p_dept_id NUMBER)
+CREATE OR REPLACE PROCEDURE saimk.p_list_employee_name_and_salary_by_department_id(p_dept_id NUMBER)
 IS
   /*
    * @author	Saim Kuru
@@ -140,6 +149,7 @@ IS
                             );
     --                   
     TYPE l_emp_t IS TABLE OF l_emp_rt;
+    --
     l_emps l_emp_t;
 BEGIN
     SELECT t.first_name, t.last_name, t.salary
@@ -149,13 +159,15 @@ BEGIN
     WHERE t.department_id = p_dept_id
     ORDER BY t.first_name, t.last_name
     ;
-    FOR II IN 1..l_emps.COUNT LOOP
-        dbms_output.put_line(l_emps(II).fn||', '||l_emps(II).ln||', '||l_emps(II).sl);
+    --
+    FOR indx IN 1..l_emps.COUNT LOOP
+        dbms_output.put_line(indx || ') ' || l_emps(indx).fn || ', ' || l_emps(indx).ln || ', ' || l_emps(indx).sl);
     END LOOP;
 END p_list_employee_name_and_salary_by_department_id
 ;
-
+--
 BEGIN
-   p_list_employee_name_and_salary_by_department_id(100);
+   saimk.p_list_employee_name_and_salary_by_department_id(100);
 END
 ;
+/*----------------------------------------------------------------------------*/
