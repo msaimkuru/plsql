@@ -8,7 +8,7 @@
  * ----------------------------------------------------------------------------- 
  * - If you want the PL/SQL engine to execute as many of the DML statements as 
  * possible, even if errors are raised along the way, add the SAVE EXCEPTIONS 
- * clause to the FORALL header. 
+ * clause to the FORALL header.
  
  * - Then, if the SQL engine raises an error, the PL/SQL engine will save that 
  * information in a pseudo-collection** named SQL%BULK_EXCEPTIONS, and continue
@@ -20,8 +20,8 @@
  * have occurred. You can then write error information to a log table and/or 
  * attempt recovery of the DML statement.
  *
- * - SQL%BULK_EXCEPTIONS  is a collection of records, each of which has 
- * 2 fields: ERROR_INDEX and ERROR_CODE.
+ * - SQL%BULK_EXCEPTIONS is a collection of records, each of which has 2 fields: 
+ * ERROR_INDEX and ERROR_CODE.
  *
  * - The ERROR_INDEX field contains a sequentially generated integer, 
  * incremented with each either successful or erroneous statement execution in 
@@ -58,7 +58,7 @@ DECLARE
 BEGIN
    FORALL indx IN 1 .. enames_with_errors.COUNT SAVE EXCEPTIONS  
       UPDATE saimk.employees t
-      SET t.first_name = enames_with_errors (indx)
+      SET t.first_name = enames_with_errors(indx)
       ;
    /* 
     * to leave the table in its original state for next examples 
@@ -84,13 +84,12 @@ BEGIN
             || ': occurred on SQL%BULK_EXCEPTIONS'' sequential index '
             || SQL%BULK_EXCEPTIONS(indx).ERROR_INDEX
             || ' attempting to update name to "'
-            || enames_with_errors (
-                  SQL%BULK_EXCEPTIONS (indx).ERROR_INDEX)
+            || enames_with_errors(SQL%BULK_EXCEPTIONS (indx).ERROR_INDEX)
             || '"')
             ;
             --
             dbms_output.put_line ('Oracle error is '
-            || SQLERRM (-1 * SQL%BULK_EXCEPTIONS (indx).ERROR_CODE));
+            || SQLERRM(-1 * SQL%BULK_EXCEPTIONS (indx).ERROR_CODE));
             --
             dbms_output.put_line('----------------------------------------');
         END LOOP;
@@ -183,13 +182,14 @@ BEGIN
    EXCEPTION
       WHEN OTHERS THEN
          dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT || ' rows.');  
-         dbms_output.put_line ('-----');
-         dbms_output.put_line (SQLERRM);
-         dbms_output.put_line ('-----');
-         dbms_output.put_line (dbms_utility.format_error_stack);         
-         dbms_output.put_line ('-----');
-         dbms_output.put_line (dbms_utility.format_error_backtrace);
-         dbms_output.put_line('----------------------------------------');
+         --         
+         dbms_output.put_line ('---------------------------------------------');
+         dbms_output.put_line ('                            SQLERRM -> '||SQLERRM);
+         dbms_output.put_line ('---------------------------------------------');
+         dbms_output.put_line ('    DBMS_UTILITY.FORMAT_ERROR_STACK -> '||dbms_utility.format_error_stack);         
+         dbms_output.put_line ('---------------------------------------------');
+         dbms_output.put_line ('DBMS_UTILITY.FORMAT_ERROR_BACKTRACE -> '||dbms_utility.format_error_backtrace);
+         dbms_output.put_line ('---------------------------------------------');              
          --
          dbms_output.put_line('----- Salaries after update -----');
          FOR JJ IN(SELECT t.* FROM saimk.employees t WHERE t.employee_id in (101, 111, 117, 131, 143) ORDER BY t.employee_id)
@@ -205,13 +205,12 @@ BEGIN
             || ' - bind array index: '
             || SQL%BULK_EXCEPTIONS (indx).ERROR_INDEX
             || ' attempting to update salary to '
-            || l_salaries (
-                  SQL%BULK_EXCEPTIONS (indx).ERROR_INDEX))
+            || l_salaries(SQL%BULK_EXCEPTIONS (indx).ERROR_INDEX))
             ;
             --
             dbms_output.put_line (
                'Oracle error is '
-            || SQLERRM (-1 * SQL%BULK_EXCEPTIONS (indx).ERROR_CODE))
+            || SQLERRM(-1 * SQL%BULK_EXCEPTIONS (indx).ERROR_CODE))
             ;
             --
             dbms_output.put_line('----------------------------------------');
