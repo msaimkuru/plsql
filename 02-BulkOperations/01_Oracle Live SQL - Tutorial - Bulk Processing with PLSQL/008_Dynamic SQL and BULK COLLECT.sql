@@ -23,13 +23,13 @@ DECLARE
    --
    TYPE ids_t IS TABLE OF saimk.employees.employee_id%TYPE;
    --
-   l_ids   ids_t;
+   l_ids ids_t;
 BEGIN
    EXECUTE IMMEDIATE
       'SELECT t.employee_id 
        FROM saimk.employees t
        WHERE t.department_id = :dept_id'
-   BULK COLLECT 
+   BULK COLLECT
    INTO l_ids
    USING 50
    ;
@@ -39,8 +39,7 @@ BEGIN
       l_cnt := l_cnt + 1;
       dbms_output.put_line (l_cnt || ') ' || l_ids (indx));
    END LOOP;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /* 
  * ----------------------------------------------------------------------------
@@ -50,11 +49,11 @@ END
  * ----------------------------------------------------------------------------
  */
 DECLARE
-  TYPE cnt_t IS TABLE OF NUMBER INDEX BY PLS_INTEGER;
-  --
-  l_cnts cnt_t;
+   TYPE cnt_t IS TABLE OF NUMBER INDEX BY PLS_INTEGER;
+   --
+   l_cnts cnt_t;
 BEGIN
-    EXECUTE IMMEDIATE 
+   EXECUTE IMMEDIATE 
     'SELECT COUNT(1) cnt
      FROM saimk.employees t
      WHERE t.department_id = :1
@@ -71,8 +70,7 @@ BEGIN
     FOR indx IN 1..l_cnts.COUNT LOOP
       dbms_output.put_line(l_cnts(indx));
     END LOOP;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * ----------------------------------------------------------------------------
@@ -107,8 +105,7 @@ BEGIN
     * to leave the table in its original state for next examples 
     */
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * -----------------------------------------------------------------------------
@@ -132,25 +129,27 @@ END
  * ----------------------------------------------------------------------------- 
  */
 DECLARE
-    l_first_names dbms_sql.varchar2_table;
-    l_last_names dbms_sql.varchar2_table;
-    l_salaries dbms_sql.number_table;
-    --
-    PROCEDURE p_get_emp_info (
-       p_where_in IN VARCHAR2,
-       p_first_names_out OUT dbms_sql.varchar2_table,
-       p_last_names_out OUT dbms_sql.varchar2_table,
-       p_salaries_out OUT dbms_sql.number_table
+   l_first_names dbms_sql.varchar2_table;
+   l_last_names dbms_sql.varchar2_table;
+   l_salaries dbms_sql.number_table;
+   --
+   PROCEDURE p_get_emp_info (
+      p_where_in IN VARCHAR2,
+      p_first_names_out OUT dbms_sql.varchar2_table,
+      p_last_names_out OUT dbms_sql.varchar2_table,
+      p_salaries_out OUT dbms_sql.number_table
     )
     IS 
     BEGIN
-      EXECUTE IMMEDIATE 'SELECT t.first_name, t.last_name, t.salary
-                         FROM SAIMK.employees t
-                         WHERE ' ||
-                         p_where_in
-      BULK COLLECT 
-      INTO p_first_names_out, p_last_names_out, p_salaries_out
-      ; 
+       EXECUTE IMMEDIATE 'SELECT t.first_name, t.last_name, t.salary
+                          FROM SAIMK.employees t
+                          WHERE' ||
+                          CASE WHEN p_where_in IS NULL THEN ' 1 = 1' 
+                               ELSE ' ' || p_where_in
+                          END     
+       BULK COLLECT 
+       INTO p_first_names_out, p_last_names_out, p_salaries_out
+       ; 
     END p_get_emp_info;
 BEGIN
   --
@@ -170,7 +169,15 @@ BEGIN
   --
   FOR indx IN 1..l_last_names.COUNT LOOP
     dbms_output.put_line(indx || ') ' || l_first_names(indx) || ', ' || l_last_names(indx) || ', ' || l_salaries(indx));
-  END LOOP;   
-END
-;
+  END LOOP; 
+  --
+  p_get_emp_info (NULL, l_first_names, l_last_names, l_salaries);
+  dbms_output.put_line('----------------------------------------');
+  dbms_output.put_line ('No filter..'); 
+  dbms_output.put_line('----------------------------------------');
+  --
+  FOR indx IN 1..l_last_names.COUNT LOOP
+    dbms_output.put_line(indx || ') ' || l_first_names(indx) || ', ' || l_last_names(indx) || ', ' || l_salaries(indx));
+  END LOOP;    
+END;
 /*----------------------------------------------------------------------------*/

@@ -12,15 +12,15 @@
  * ----------------------------------------------------------------------------
  * Here are some things to know about how BULK COLLECT works:
  * ----------------------------------------------------------------------------
- * - It can be used with all three types of collections: associative arrays, 
+ * 1) It can be used with all three types of collections: associative arrays, 
  * nested tables, and VARRAYs.
  * 
- * - You can fetch into individual collections (one for each expression in the 
+ * 2) You can fetch into individual collections (one for each expression in the 
  * SELECT list) or a single collection of records.
  *
- * - The collection is always populated densely, starting from index value 1.
+ * 3) The collection is always populated densely, starting from index value 1.
  * 
- * - If no rows are fetched, then the collection is emptied of all elements.
+ * 4) If no rows are fetched, then the collection is emptied of all elements.
  * ----------------------------------------------------------------------------
  * You can use BULK COLLECT in all these forms:
  * ----------------------------------------------------------------------------
@@ -39,19 +39,29 @@
  * ----------------------------------------------------------------------------
  */
 DECLARE
-   TYPE employee_info_t IS TABLE OF saimk.employees%ROWTYPE;
-   --
-   l_employees employee_info_t;
+  TYPE employee_info_t IS TABLE OF saimk.employees%ROWTYPE INDEX BY PLS_INTEGER;
+  --
+  l_emps employee_info_t;
 BEGIN
-   SELECT t.*
-   BULK COLLECT 
-   INTO l_employees
+   SELECT t.* 
+   BULK COLLECT
+   INTO l_emps
    FROM saimk.employees t
+   ORDER BY t.employee_id
    ;
    --
-   dbms_output.put_line (l_employees.COUNT);
-END
-;
+   dbms_output.put_line('----------------------------------------------------');
+   dbms_output.put_line('#Rows Fetched by Bulk Collect In a Single Context Switch: ' || l_emps.COUNT);   
+   dbms_output.put_line('----------------------------------------------------');
+   dbms_output.put_line('Employees List');
+   dbms_output.put_line('----------------------------------------------------');
+   --
+   FOR indx IN 1..l_emps.COUNT 
+   LOOP
+      dbms_output.put_line(indx || ')' || l_emps(indx).employee_id || ', ' || l_emps(indx).first_name || ', ' || l_emps(indx).last_name || ', ' || l_emps(indx).salary);
+   END LOOP;
+   --
+END;   
 /*----------------------------------------------------------------------------*/
 /*
  * If you do not want to retrieve all the columns in a table, create your own 
@@ -70,7 +80,7 @@ DECLARE
    --
    TYPE employee_info_t IS TABLE OF two_cols_rt;
    --
-   l_employees   employee_info_t;
+   l_employees employee_info_t;
 BEGIN
    SELECT t.employee_id, t.salary
    BULK COLLECT
@@ -80,8 +90,7 @@ BEGIN
    ;
    --
    dbms_output.put_line (l_employees.COUNT);
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /* ----------
  * Quick Tip:
@@ -115,8 +124,7 @@ BEGIN
    ;
    --
    dbms_output.put_line (l_employees.COUNT);
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * -----------------------------------------------------------------------------
@@ -163,11 +171,9 @@ BEGIN
     FOR indx IN 1..l_emps.COUNT LOOP
         dbms_output.put_line(indx || ') ' || l_emps(indx).fn || ', ' || l_emps(indx).ln || ', ' || l_emps(indx).sl);
     END LOOP;
-END p_list_employee_name_and_salary_by_department_id
-;
+END p_list_employee_name_and_salary_by_department_id;
 --
 BEGIN
    saimk.p_list_employee_name_and_salary_by_department_id(100);
-END
-;
+END;
 /*----------------------------------------------------------------------------*/

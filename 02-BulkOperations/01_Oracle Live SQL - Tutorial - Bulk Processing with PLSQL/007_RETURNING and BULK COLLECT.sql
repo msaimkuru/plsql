@@ -9,7 +9,7 @@
  * The RETURNING clause is a wonderful thing. If you are inserting, updating or 
  * deleting data, and you need to get some information back after the statement 
  * completes (such as the primary key of the newly-inserted row), RETURNING is 
- * the thing for you! 
+ * the thing for you!
  *
  * Here's an example:
  */
@@ -17,11 +17,11 @@
  * ----------------------------------------------------------------------------
  * EXAMPLE 1:
  * ----------------------------------------------------------------------------
- * We create a table named t for this example. After the example we drop this
- * table.
+ * We create a table named t for this example. After the example we will drop 
+ * this table.
  * ---------------------------------------------------------------------------- 
  */
-CREATE TABLE saimk.t (
+CREATE TABLE saimk.t(
    id NUMBER GENERATED ALWAYS AS IDENTITY,
    n NUMBER
 )
@@ -41,8 +41,7 @@ BEGIN
    dbms_output.put_line ('l_id-->'||l_id);
    dbms_output.put_line ('l_n-->'||l_n);
    --
-END
-;
+END;
 --
 DROP TABLE saimk.t;
 /*----------------------------------------------------------------------------*/
@@ -62,8 +61,6 @@ DROP TABLE saimk.t;
            ;
            ROLLBACK;
         END;
- *
- * Oh no!
  *
  * ORA-01422: exact fetch returns more than requested number of rows
  * But wait, that's the sort of error you can get with a SELECT-INTO that 
@@ -110,8 +107,7 @@ BEGIN
     * to leave the table in its original state for next examples 
     */
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * -----------------------------------------------------------------------------
@@ -132,33 +128,32 @@ END
  * ----------------------------------------------------------------------------- 
  */
 DECLARE
-  TYPE l_emp_rt IS RECORD (employee_id saimk.employees.employee_id%TYPE,
-                           first_name saimk.employees.first_name%TYPE,
-                           last_name saimk.employees.last_name%TYPE
-                          );
-  --                        
-  TYPE l_emp_t IS TABLE OF l_emp_rt INDEX BY PLS_INTEGER;
-  --
-  l_emps l_emp_t;
-  --
+   TYPE l_emp_rt IS RECORD (employee_id saimk.employees.employee_id%TYPE,
+                            first_name saimk.employees.first_name%TYPE,
+                            last_name saimk.employees.last_name%TYPE
+                           );
+   --                        
+   TYPE l_emp_t IS TABLE OF l_emp_rt INDEX BY PLS_INTEGER;
+   --
+   l_emps l_emp_t;
+   --
 BEGIN  
-  DELETE
-  FROM saimk.employees t
-  WHERE t.department_id = 50
-  RETURNING t.employee_id, t.first_name, t.last_name
-  BULK COLLECT
-  INTO l_emps
-  ;
-  --
-  FOR indx IN 1..l_emps.COUNT LOOP
-    dbms_output.put_line(indx || ') ' || l_emps(indx).employee_id || ', ' || l_emps(indx).first_name || ', ' || l_emps(indx).last_name);
-  END LOOP;
-  /* 
-   * to leave the table in its original state for next examples 
-   */
-  ROLLBACK;
-END
-;
+   DELETE
+   FROM saimk.employees t
+   WHERE t.department_id = 50
+   RETURNING t.employee_id, t.first_name, t.last_name
+   BULK COLLECT
+   INTO l_emps
+   ;
+   --
+   FOR indx IN 1..l_emps.COUNT LOOP
+      dbms_output.put_line(indx || ') ' || l_emps(indx).employee_id || ', ' || l_emps(indx).first_name || ', ' || l_emps(indx).last_name);
+   END LOOP;
+   /* 
+    * to leave the table in its original state for next examples 
+    */
+   ROLLBACK;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * ----------------------------------------------------------------------------- 
@@ -171,11 +166,11 @@ END
 DECLARE
    TYPE ids_t IS TABLE OF employees.employee_id%TYPE;
    --
-   l_ids     ids_t;
+   l_ids ids_t;
    --
    TYPE names_t IS TABLE OF employees.last_name%TYPE;
    --
-   l_names   names_t;
+   l_names names_t;
 BEGIN
    DELETE 
    FROM saimk.employees t
@@ -187,12 +182,11 @@ BEGIN
    --
    FOR indx IN 1 .. l_ids.COUNT
    LOOP
-      dbms_output.put_line (l_ids (indx) || ' - ' || l_names (indx));
+      dbms_output.put_line (indx || ') ' || l_ids (indx) || ' - ' || l_names (indx));
    END LOOP;
    /* 
     * to leave the table in its original state for next examples 
     */
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/

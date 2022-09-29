@@ -4,7 +4,7 @@
  * -----------------------------------------------------------------------------
  * https://livesql.oracle.com/apex/livesql/file/tutorial_IEHP37S6LTWIIDQIR436SJ59L.html
  * -----------------------------------------------------------------------------
- * 2. Context Switch and The Row by Row Problem
+ * 2. Context Switch and The Row by Row Context Switching Problem
  * -----------------------------------------------------------------------------
  * Almost every program Oracle Database developers write includes both PL/SQL 
  * and SQL statements. 
@@ -29,16 +29,15 @@
  * cursor FOR loop and the ability to call SQL statements natively in PL/SQL, I
  * can implement this requirement easily:
  *
-        CREATE OR REPLACE PROCEDURE P_increase_salary(
-           p_department_id_in   IN saimk.employees.department_id%TYPE,
-           p_increase_pct_in    IN NUMBER)
+        CREATE OR REPLACE PROCEDURE p_increase_salary(
+           p_department_id_in IN saimk.employees.department_id%TYPE,
+           p_increase_pct_in IN NUMBER)
         IS
         BEGIN
            FOR employee_rec
               IN (SELECT t.employee_id
                     FROM saimk.employees t
-                   WHERE t.department_id =
-                            p_increase_salary.p_department_id_in
+                   WHERE t.department_id = p_increase_salary.p_department_id_in
                  )
            LOOP
               UPDATE saimk.employees emp
@@ -47,7 +46,10 @@
               WHERE emp.employee_id = employee_rec.employee_id
               ;
               --
-              dbms_output.put_line ('#Updated Rows:' || SQL%ROWCOUNT);
+              dbms_output.put_line ('#Rows Updated:' || SQL%ROWCOUNT);
+              --
+              --to leave the table in its original state for next examples 
+              ROLLBACK;                
            END LOOP;
         END p_increase_salary;
  * 
@@ -56,7 +58,6 @@
  *
         BEGIN
            p_increase_salary (50, .10);
-           ROLLBACK; -- to leave the table in its original state
         END;
  *
  * ....the PL/SQL engine will “switch” over to the SQL engine 10000 times, once 

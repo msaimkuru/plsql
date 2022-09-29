@@ -6,9 +6,10 @@
  * -----------------------------------------------------------------------------
  * 16. Dynamic SQL and FORALL
  * ----------------------------------------------------------------------------- 
- * Have you got a dynamic update, insert or delete sitting inside a loop? Don't 
- * worry....FORALL will still come to the rescue! Yes, that's right, you can put 
- * an EXECUTE IMMEDIATE statement inside FORALL, as well as static SQL. 
+ * Have you got a dynamic update, insert or delete sitting inside a loop? 
+ * 
+ * Don't worry....FORALL will still come to the rescue! Yes, that's right, you 
+ * can put an EXECUTE IMMEDIATE statement inside FORALL, as well as static SQL. 
  * 
  * Let's take a look.
  * -----------------------------------------------------------------------------
@@ -53,7 +54,7 @@ DECLARE
                  RETURNING 
                  BULK COLLECT 
                  INTO l_enames
-                 ;
+      ;
       --
       FOR indx IN 1 .. l_enames.COUNT
       LOOP
@@ -70,6 +71,5 @@ BEGIN
    BEGIN
       p_update_emps ('salary', l_ids);
    END;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/

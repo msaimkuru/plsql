@@ -25,61 +25,58 @@
  * ----------------------------------------------------------------------------- 
  */
 DECLARE 
-  TYPE filter_nt IS TABLE OF VARCHAR2(100);
-  --
-  PROCEDURE p_update_by_filter(filter_in IN filter_nt)
-  IS
-  BEGIN
-    FORALL indx IN 1 .. filter_in.COUNT
-      UPDATE saimk.employees t
-      SET t.salary = t.salary * 1.1
-      WHERE UPPER (t.last_name) LIKE filter_in(indx)
+   TYPE filter_nt IS TABLE OF VARCHAR2(100);
+   --
+   PROCEDURE p_update_by_filter(filter_in IN filter_nt)
+   IS
+   BEGIN
+      FORALL indx IN 1 .. filter_in.COUNT
+         UPDATE saimk.employees t
+         SET t.salary = t.salary * 1.1
+         WHERE UPPER(t.last_name) LIKE filter_in(indx)
       ;
-    --
-    dbms_output.put_line('--------------------------------------------------');
-    dbms_output.put_line('#Total rows modified = ' || SQL%ROWCOUNT);
-    dbms_output.put_line('--------------------------------------------------');
-    --
-    FOR indx IN 1 .. filter_in.COUNT LOOP
-      IF SQL%BULK_ROWCOUNT (indx) = 0
-      THEN
-         dbms_output.put_line('BUSINESS ERROR: ' || 'No rows found for filter "' || filter_in (indx) || '"');
-         dbms_output.put_line('----------');
-         raise_application_error (
-            -20000,
-            'No rows found for filter "' || filter_in (indx) || '"');
-      ELSE
-         dbms_output.put_line (
+      --
+      dbms_output.put_line('--------------------------------------------------');
+      dbms_output.put_line('#Total rows modified = ' || SQL%ROWCOUNT);
+      dbms_output.put_line('--------------------------------------------------');
+      --
+      FOR indx IN 1 .. filter_in.COUNT LOOP
+         IF SQL%BULK_ROWCOUNT(indx) = 0
+         THEN
+            dbms_output.put_line('BUSINESS ERROR: ' || 'No rows found for filter "' || filter_in (indx) || '"');
+            dbms_output.put_line('----------');
+            raise_application_error(-20000, 'No rows found for filter "' || filter_in (indx) || '"');
+         ELSE
+            dbms_output.put_line (
                'Number of employees with names like "'
             || filter_in (indx)
             || '" given a raise: '
             || SQL%BULK_ROWCOUNT(indx));
-      END IF;
+         END IF;
+         --
+         dbms_output.put_line('----------');
+      END LOOP;
+      /* 
+       * to leave the table in its original state for next examples 
+       */ 
+      ROLLBACK;
       --
-      dbms_output.put_line('----------');
-    END LOOP;
-   /* 
-    * to leave the table in its original state for next examples 
-    */ 
-    ROLLBACK;
-    --
-    EXCEPTION
-      WHEN OTHERS THEN
-       /* 
-        * to leave the table in its original state for next examples 
-        */ 
-        ROLLBACK;
-        --
-        RAISE;
-  END p_update_by_filter;
+      EXCEPTION
+         WHEN OTHERS THEN
+            /* 
+             * to leave the table in its original state for next examples 
+             */ 
+            ROLLBACK;
+            --
+            RAISE;
+   END p_update_by_filter;
 BEGIN
    p_update_by_filter (filter_nt ('S%', 'E%', '%A%'));
    /*
     * And now with a filter that finds no employees.
     */
    p_update_by_filter (filter_nt ('S%', 'E%', '%A%', 'XXXXX'));
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * ** What's a "pseudo-collection"? It's a data structure created implicitly by 
@@ -113,33 +110,34 @@ END
  * ----------------------------------------------------------------------------- 
  */
 DECLARE
-    l_deps dbms_sql.number_table := dbms_sql.number_table(30, 20, 10);
-    l_sals dbms_sql.number_table := dbms_sql.number_table(3000, 1000, 2000);
-    --
-    PROCEDURE p_update_salaries (
-         p_department_ids_in IN dbms_sql.number_table,
-         p_salaries_in IN dbms_sql.number_table
-    )
-    IS
-    BEGIN
+   l_deps dbms_sql.number_table := dbms_sql.number_table(30, 20, 10);
+   l_sals dbms_sql.number_table := dbms_sql.number_table(3000, 1000, 2000);
+   --
+   PROCEDURE p_update_salaries (
+      p_department_ids_in IN dbms_sql.number_table,
+      p_salaries_in IN dbms_sql.number_table
+   )
+   IS
+   BEGIN
       FORALL l_indx IN 1..p_department_ids_in.COUNT
-        UPDATE saimk.employees t
-        SET t.salary = p_salaries_in(l_indx)
-        WHERE t.department_id = p_department_ids_in(l_indx)
-        ;
+         UPDATE saimk.employees t
+         SET t.salary = p_salaries_in(l_indx)
+         WHERE t.department_id = p_department_ids_in(l_indx)
+      ;
       --
-      dbms_output.put_line('#Total Rows updated:' || SQL%ROWCOUNT);
+      dbms_output.put_line('#Total Rows updated: ' || SQL%ROWCOUNT);
       --
       FOR l_indx IN 1..p_department_ids_in.COUNT LOOP
-        dbms_output.put_line('#Rows updated for department id ' || p_department_ids_in(l_indx) || ':' || SQL%BULK_ROWCOUNT(l_indx));
-        --
-        IF SQL%BULK_ROWCOUNT(l_indx) < 2 THEN
-          /* 
-           * to leave the table in its original state for next examples 
-           */        
-          ROLLBACK;
-          RAISE PROGRAM_ERROR;
-        END IF;
+         dbms_output.put_line('#Rows updated for department id ' || p_department_ids_in(l_indx) || ': ' || SQL%BULK_ROWCOUNT(l_indx));
+         --
+         IF SQL%BULK_ROWCOUNT(l_indx) < 2 THEN
+            /* 
+             * to leave the table in its original state for next examples 
+             */        
+            ROLLBACK;
+            --
+            RAISE PROGRAM_ERROR;
+         END IF;
       END LOOP;
       /* 
        * to leave the table in its original state for next examples 
@@ -147,17 +145,15 @@ DECLARE
       ROLLBACK;
       --
       EXCEPTION
-        WHEN OTHERS THEN
-          /* 
-           * to leave the table in its original state for next examples 
-           */
-          ROLLBACK;  
-          --
-          RAISE;
-    END p_update_salaries
-    ;
+         WHEN OTHERS THEN
+         /* 
+          * to leave the table in its original state for next examples 
+          */
+         ROLLBACK;  
+         --
+         RAISE;
+   END p_update_salaries;
 BEGIN
-  p_update_salaries(l_deps, l_sals);
-END
-;
+   p_update_salaries(l_deps, l_sals);
+END;
 /*----------------------------------------------------------------------------*/

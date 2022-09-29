@@ -33,13 +33,14 @@
               to get under the limit.
  * *Action:   Increase the PGA_AGGREGATE_LIMIT initialization parameter or 
  *            reduce memory usage. 
- * ------
+ * -----------------------------------------------------------------------------
  * Notes:
- * ------
+ * -----------------------------------------------------------------------------
  * PGA_AGGREGATE_LIMIT: specifies a limit on the aggregate PGA memory consumed 
  * by the instance. The value can be listed such:
  * 
        SELECT * FROM V$PARAMETER t WHERE UPPER(t.NAME) = 'PGA_AGGREGATE_LIMIT';
+ * -----------------------------------------------------------------------------       
  */ 
 DECLARE
    l_strings   dbms_sql.varchar2a;
@@ -48,8 +49,7 @@ BEGIN
    LOOP
       l_strings (indx) := RPAD ('abc', 32767, 'def');
    END LOOP;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /* 
  * When using BULK COLLECT, you could attempt to retrieve too many rows in one 
@@ -73,7 +73,7 @@ END
  * ---------------------------------------------------------------------------- 
  */
 DECLARE
-   c_limit PLS_INTEGER := 10;
+   C_LIMIT CONSTANT PLS_INTEGER := 10;
    --
    CURSOR employees_cur
    IS
@@ -84,7 +84,7 @@ DECLARE
    --
    TYPE employee_ids_t IS TABLE OF saimk.employees.employee_id%TYPE;
    --
-   l_employee_ids   employee_ids_t;
+   l_employee_ids employee_ids_t;
 BEGIN
    OPEN employees_cur;
    --
@@ -92,7 +92,7 @@ BEGIN
       FETCH employees_cur
       BULK COLLECT 
       INTO l_employee_ids
-      LIMIT c_limit
+      LIMIT C_LIMIT
       ;
       --
       dbms_output.put_line ('#Rows fetched: ' || l_employee_ids.COUNT);
@@ -101,8 +101,7 @@ BEGIN
    END LOOP;
    --
    CLOSE employees_cur;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /* 
  * One thing to watch out for when switching to LIMIT with BULK COLLECT 
@@ -156,7 +155,7 @@ END
            --
            TYPE emps_t IS TABLE OF emps_c%ROwTYPE;
            --
-           l_emps   emps_t;
+           l_emps emps_t;
            l_count INTEGER := 0;
         BEGIN
            OPEN emps_c;
@@ -203,7 +202,7 @@ END
            --
            TYPE emps_t IS TABLE OF emps_c%ROwTYPE;
            --
-           l_emps   emps_t;
+           l_emps emps_t;
            l_count INTEGER := 0;
         BEGIN
            OPEN emps_c;
@@ -233,7 +232,7 @@ END
            --
            TYPE emps_t IS TABLE OF emps_c%ROwTYPE;
            --
-           l_emps   emps_t;
+           l_emps emps_t;
            l_count INTEGER := 0;
         BEGIN
            OPEN emps_c;
@@ -273,7 +272,7 @@ END
  * ----------------------------------------------------------------------------- 
  */
 DECLARE
-  c_limit CONSTANT PLS_INTEGER := 5;
+  C_LIMIT CONSTANT PLS_INTEGER := 5;
   l_cnt NUMBER := 0;
   --
   TYPE l_emp_rt IS RECORD(first_name saimk.employees.first_name%TYPE,
@@ -285,7 +284,8 @@ DECLARE
   --
   l_emps l_emp_t;
   --
-  CURSOR c_emps IS
+  CURSOR c_emps 
+  IS
   SELECT t.first_name, t.last_name, t.salary
   FROM saimk.employees t
   ORDER BY t.first_name, t.last_name
@@ -297,18 +297,17 @@ BEGIN
     FETCH c_emps
     BULK COLLECT
     INTO l_emps
-    LIMIT c_limit
+    LIMIT C_LIMIT
     ;
     --
     EXIT WHEN l_emps.COUNT = 0;
     --
     FOR indx IN 1..l_emps.COUNT LOOP
       l_cnt := l_cnt + 1;
-      dbms_output.put_line(l_cnt || ')' || l_emps(indx).first_name || ', ' ||l_emps(indx).last_name|| ', ' ||l_emps(indx).salary);
+      dbms_output.put_line(l_cnt || ') ' || l_emps(indx).first_name || ', ' ||l_emps(indx).last_name|| ', ' ||l_emps(indx).salary);
     END LOOP;     
   END LOOP;
   --
   CLOSE c_emps; 
-END
-;
+END;
 /*----------------------------------------------------------------------------*/

@@ -61,7 +61,7 @@ BEGIN
       UPDATE saimk.employees t
       SET t.salary = 10000
       WHERE t.employee_id = l_employees(l_index)
-      ;
+   ;
    --
    DBMS_OUTPUT.put_line('#Rows updated: ' || SQL%ROWCOUNT);
    --
@@ -69,6 +69,5 @@ BEGIN
     * to leave the table in its original state for next examples 
     */   
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/

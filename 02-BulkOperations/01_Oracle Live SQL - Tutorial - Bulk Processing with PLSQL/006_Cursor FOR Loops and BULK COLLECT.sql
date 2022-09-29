@@ -5,36 +5,36 @@
  * https://livesql.oracle.com/apex/livesql/file/tutorial_IEHP37S6LTWIIDQIR436SJ59L.html
  * -----------------------------------------------------------------------------
  * 6. Cursor FOR Loops and BULK COLLECT 
- *    When should you convert a non-bulk query to one using BULK COLLECT? 
+ *    -- When should you convert a non-bulk query to one using BULK COLLECT? --
  * -----------------------------------------------------------------------------
  * When should you convert a non-bulk query to one using BULK COLLECT? 
  * More specifically, should you convert a cursor FOR loop to an explicit cursor 
  * and FETCH BULK COLLECT with limit? Here are some things to keep in mind:
  * 
- * - As long as your PL/SQL optimization level is set to 2 (the default) or 
+ * 1) As long as your PL/SQL optimization level is set to 2 (the default) or 
  * higher, the compiler will automatically optimize cursor FOR loops to retrieve 
  * 100 rows with each fetch. You cannot modify this number.
  *
- * - If your cursor FOR loop is "read only" (it does not execute non-query DML), 
+ * 2) If your cursor FOR loop is "read only" (it does not execute non-query DML), 
  * then you can probably leave it as is. That is, fetching 100 rows with each 
  * fetch will usually give you sufficient improvements in performance over 
  * row-by-row fetching.
  *
- * - Only cursor FOR loops are optimized this way, so if you have a simple or 
+ * 3) Only cursor FOR loops are optimized this way, so if you have a simple or 
  * WHILE loop that fetches individual rows, you should convert to 
  * BULK COLLECT - with LIMIT!
  * 
- * - If you are fetching a very large number of rows, such as might happen with 
+ * 4) If you are fetching a very large number of rows, such as might happen with 
  * data warehouse processing or a nightly batch process, then you should 
  * experiment with larger LIMIT values to see what kind of "bang for the buck" 
  * you will get.
  * 
- * - If your cursor FOR loop (or any other kind of loop for that matter) 
+ * 5) If your cursor FOR loop (or any other kind of loop for that matter) 
  * contains one or more non-query DML statements (insert, update, delete, 
  * merge), you should convert to BULK COLLECT and FORALL.
  * 
  * -----------------------------------------------------------------------------
- * Note:
+ * Notes:
  * ----------------------------------------------------------------------------- 
  * Resource: https://buildmedia.readthedocs.org/media/pdf/oracle/latest/oracle.pdf
  * -----------------------------------------------------------------------------
@@ -56,8 +56,10 @@
  */
 /* 
  * ----------------------------------------------------------------------------
- * EXAMPLE 1: Run the following code to see how optimization affects cursor FOR 
- * loop performance.
+ * EXAMPLE 1: 
+ * ---------------------------------------------------------------------------- 
+ * Run the following code to see how optimization affects cursor FOR loop 
+ * performance.
  *
  * Test cursor performance for:
  * -> implicit cursor for loop
@@ -67,13 +69,14 @@
  */ 
 CREATE OR REPLACE PROCEDURE saimk.p_test_cursor_performance(p_approach IN VARCHAR2)
 IS
-  /*
-   * @author	Saim Kuru
-   * @version 1.0
-   * Created for Bulk Processing with PL/SQL Tutorial on 
-   * https://livesql.oracle.com/apex/livesql/file/tutorial_IEHP37S6LTWIIDQIR436SJ59L.html
-   */
-   CURSOR cur IS
+   /*
+    * @author	Saim Kuru
+    * @version 1.0
+    * Created for Bulk Processing with PL/SQL Tutorial on 
+    * https://livesql.oracle.com/apex/livesql/file/tutorial_IEHP37S6LTWIIDQIR436SJ59L.html
+    */
+   CURSOR cur 
+   IS
    SELECT t.* 
    FROM all_source t
    WHERE ROWNUM < 100001
@@ -81,9 +84,9 @@ IS
    --
    l_one_row cur%ROWTYPE;
    --
-   TYPE t IS TABLE OF cur%ROWTYPE INDEX BY PLS_INTEGER;
+   TYPE tbl_t IS TABLE OF cur%ROWTYPE INDEX BY PLS_INTEGER;
    --
-   l_many_rows t;
+   l_many_rows tbl_t;
    --
    l_last_timing NUMBER;
    l_cntr NUMBER := 0;
@@ -97,12 +100,14 @@ IS
    PROCEDURE p_show_elapsed_time(message_in IN VARCHAR2 := NULL)
    IS
    BEGIN
-      dbms_output.put_line (
+      dbms_output.put_line(
             '"'
          || message_in
          || '" completed in: '
-         || TO_CHAR (
-               ROUND ( (dbms_utility.get_cpu_time - l_last_timing) / 100, 2)));
+         || TO_CHAR(ROUND((dbms_utility.get_cpu_time - l_last_timing) / 100, 2
+                         )
+                   )
+       );
    END p_show_elapsed_time; 
 BEGIN
    p_start_timer;
@@ -156,8 +161,8 @@ BEGIN
    END CASE;
    --
    p_show_elapsed_time (p_approach);
-END p_test_cursor_performance
-;
+   --
+END p_test_cursor_performance;
 /*----------------------------------------------------------------------------*/
 /* 
  * Try different approaches with optimization disabled. 
@@ -174,8 +179,7 @@ BEGIN
    saimk.p_test_cursor_performance ('explicit open, fetch, close');
    --
    saimk.p_test_cursor_performance ('bulk fetch');
-END
-;
+END;
 /*
  * ----------------------------------------------------------------------------- 
  * OUTPUT
@@ -205,8 +209,7 @@ BEGIN
    saimk.p_test_cursor_performance ('explicit open, fetch, close');
    --
    saimk.p_test_cursor_performance ('bulk fetch');
-END
-;
+END;
 /*
  * ----------------------------------------------------------------------------- 
  * OUTPUT
@@ -228,12 +231,15 @@ END
  * ----------------------------------------------------------------------------- 
  * This exercise has two parts (and for this exercise assume that the employees 
  * table has 1M rows with data distributed equally amongst departments: 
+ *
  * (1) Write an anonymous block that contains a cursor FOR loop that does not 
  * need to be converted to using BULK COLLECT. 
+ *
  * (2) Write an anonymous block that contains a cursor FOR loop that does need
  * to use BULK COLLECT (assume it cannot be rewritten in "pure" SQL).
  */
-/* ----------------------------------------------------------------------------- 
+/*
+ * ----------------------------------------------------------------------------- 
  * Solutions For Exercise 3
  * -----------------------------------------------------------------------------  
  */ 
@@ -246,15 +252,14 @@ BEGIN
     * compiler will automatically optimize the CFL to run "like" a
     * BULK COLLECT with limit set to 100. 
     */
-   FOR rec IN (SELECT *
+   FOR rec IN (SELECT t.*
                  FROM saimk.employees t
                 WHERE t.department_id = 50
               )
    LOOP
       dbms_output.put_line (rec.last_name || ' - ' || rec.salary);
    END LOOP;
-END
-;
+END;
 /*
  * Solution for Exercise 3 Part 2
  */
@@ -283,6 +288,5 @@ BEGIN
     * to leave the table in its original state for next examples 
     */
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/

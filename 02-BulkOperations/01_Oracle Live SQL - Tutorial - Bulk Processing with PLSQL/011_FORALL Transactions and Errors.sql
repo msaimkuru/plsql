@@ -10,11 +10,11 @@
  * Constraint violations, values too large for columns....now add to that the 
  * fact that with FORALL you are executing that DML statement many times over. 
  * Managing errors with FORALL is a tricky and important thing to do!
- *
+ * ----------------------------------------------------------------------------- 
  * Before diving into the error-related features of FORALL, let's review some 
  * important points about transactions, errors and exceptions in the world of 
  * PL/SQL.
- *
+ * ----------------------------------------------------------------------------- 
  * 1) If the SQL engine raises an error back to the PL/SQL engine, that does not 
  * cause an automatic rollback of previously successful DML statements. They are 
  * still waiting to be committed or rolled back.
@@ -32,7 +32,7 @@
  * LOG ERRORS in this tutorial. We just wanted to make sure you are aware. :-) 
  * Oh and search LiveSQL for "log errors" to see a script or two on that
  * feature.
- * 
+ * ----------------------------------------------------------------------------- 
  * What does this for FORALL? That, by default, the first time the SQL engine 
  * encounters an error processing the DML statement passed to it from FORALL, 
  * it stops and passes the error back to the PL/SQL engine. No further 
@@ -58,9 +58,9 @@ DECLARE
    l_numbers numbers_t := numbers_t(1, 10, 100);
 BEGIN
    FORALL indx IN 1 .. l_numbers.COUNT
-      INSERT INTO mynums (n)
-      VALUES (l_numbers (indx))
-      ;
+      INSERT INTO mynums(n)
+      VALUES (l_numbers(indx))
+   ;
    /* 
     * to leave the table in its original state for next examples 
     */
@@ -68,10 +68,10 @@ BEGIN
    --  
    EXCEPTION
       WHEN OTHERS THEN
-         dbms_output.put_line ('#With FORALL Updated Totally ' || SQL%ROWCOUNT || ' rows.');
+         dbms_output.put_line ('#With FORALL inserted Totally ' || SQL%ROWCOUNT || ' rows.');
          --
          FOR l_index IN 1..l_numbers.COUNT LOOP
-            dbms_output.put_line ('At FORALL step ' || l_index || ' Updated ' || SQL%BULK_ROWCOUNT(l_index) || ' rows.');
+            dbms_output.put_line ('At FORALL step ' || l_index || ' inserted ' || SQL%BULK_ROWCOUNT(l_index) || ' rows.');
          END LOOP;
          --
          dbms_output.put_line('SQLERRM: ' || SQLERRM);
@@ -79,8 +79,7 @@ BEGIN
           * to leave the table in its original state for next examples 
           */
          ROLLBACK;
-END
-;
+END;
 /*
  * -----------------------------------------------------------------------------
  * EXAMPLE 2: Error occuring during the first SQL stataement of a FORALL process
@@ -92,12 +91,12 @@ END
 DECLARE
    TYPE numbers_t IS TABLE OF NUMBER;
    --
-   l_numbers   numbers_t := numbers_t (100, 10, 1);
+   l_numbers   numbers_t := numbers_t(100, 10, 1);
 BEGIN
    FORALL indx IN 1 .. l_numbers.COUNT
-      INSERT INTO mynums (n)
-      VALUES (l_numbers (indx))
-      ;
+      INSERT INTO mynums(n)
+      VALUES (l_numbers(indx))
+   ;
    /* 
     * to leave the table in its original state for next examples 
     */
@@ -105,10 +104,10 @@ BEGIN
    --
    EXCEPTION
       WHEN OTHERS THEN
-         dbms_output.put_line('#With FORALL Updated Totally ' || SQL%ROWCOUNT || ' rows.');
+         dbms_output.put_line('#With FORALL inserted Totally ' || SQL%ROWCOUNT || ' rows.');
          --
          FOR l_index IN 1..l_numbers.COUNT LOOP
-            dbms_output.put_line('At FORALL step ' || l_index || ' Updated ' || SQL%BULK_ROWCOUNT(l_index) || ' rows.');
+            dbms_output.put_line('At FORALL step ' || l_index || ' inserted ' || SQL%BULK_ROWCOUNT(l_index) || ' rows.');
          END LOOP;
          --
          dbms_output.put_line('SQLERRM:' || SQLERRM);
@@ -116,8 +115,7 @@ BEGIN
           * to leave the table in its original state for next examples 
           */
          ROLLBACK; 
-END
-;
+END;
 --
 DROP TABLE saimk.mynums;
 --
@@ -205,35 +203,34 @@ DECLARE
    /* Solution 9.1: All valid, 3 rows should be updated. */
    TYPE numbers_nt IS TABLE OF NUMBER;
    --
-   l_ids        numbers_nt := numbers_nt (101, 111, 131);
-   l_salaries   numbers_nt := numbers_nt (10000, 11000, 12000);
+   l_ids numbers_nt := numbers_nt (101, 111, 131);
+   l_salaries numbers_nt := numbers_nt (10000, 11000, 12000);
 BEGIN
    FORALL indx IN 1 .. l_ids.COUNT
       UPDATE saimk.employees t
       SET t.salary = l_salaries(indx)
       WHERE t.employee_id = l_ids(indx)
-      ;
+   ;
    --
    dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT);
    /* 
     * to leave the table in its original state for next examples 
     */
    ROLLBACK;
-END
-;
+END;
 --
 DECLARE
    /*  Solution 9.2: First one too big so no rows updated. */
    TYPE numbers_nt IS TABLE OF NUMBER;
    --
-   l_ids        numbers_nt := numbers_nt (101, 111, 131);
-   l_salaries   numbers_nt := numbers_nt (1000000, 11000, 12000);
+   l_ids numbers_nt := numbers_nt (101, 111, 131);
+   l_salaries numbers_nt := numbers_nt (1000000, 11000, 12000);
 BEGIN
    FORALL indx IN 1 .. l_ids.COUNT
       UPDATE saimk.employees t
       SET t.salary = l_salaries(indx)
       WHERE t.employee_id = l_ids(indx)
-      ;
+   ;
    --
    dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT);
    /* 
@@ -243,14 +240,13 @@ BEGIN
    --
    EXCEPTION
       WHEN OTHERS THEN
-          dbms_output.put_line(SQLERRM);
-          dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT);
-          /* 
-           * to leave the table in its original state for next examples 
-           */      
-          ROLLBACK;
-END
-;
+         dbms_output.put_line(SQLERRM);
+         dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT);
+         /* 
+          * to leave the table in its original state for next examples 
+          */      
+         ROLLBACK;
+END;
 --
 DECLARE
    /*  Solution 9.3: Last one too big so 2 rows updated. */
@@ -261,9 +257,9 @@ DECLARE
 BEGIN
    FORALL indx IN 1 .. l_ids.COUNT
       UPDATE saimk.employees t
-      SET t.salary = l_salaries (indx)
-      WHERE t.employee_id = l_ids (indx)
-      ;
+      SET t.salary = l_salaries(indx)
+      WHERE t.employee_id = l_ids(indx)
+   ;
    --
    dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT);
    /* 
@@ -279,6 +275,5 @@ BEGIN
           * to leave the table in its original state for next examples 
           */      
          ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/

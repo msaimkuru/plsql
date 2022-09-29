@@ -59,7 +59,7 @@ BEGIN
    FORALL indx IN 1 .. enames_with_errors.COUNT SAVE EXCEPTIONS  
       UPDATE saimk.employees t
       SET t.first_name = enames_with_errors(indx)
-      ;
+   ;
    /* 
     * to leave the table in its original state for next examples 
     */
@@ -70,11 +70,11 @@ BEGIN
          dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT || ' rows.');  
          --         
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('                            SQLERRM -> '||SQLERRM);
+         dbms_output.put_line ('                            SQLERRM -> ' || SQLERRM);
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('    DBMS_UTILITY.FORMAT_ERROR_STACK -> '||dbms_utility.format_error_stack);         
+         dbms_output.put_line ('    DBMS_UTILITY.FORMAT_ERROR_STACK -> ' || dbms_utility.format_error_stack);         
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('DBMS_UTILITY.FORMAT_ERROR_BACKTRACE -> '||dbms_utility.format_error_backtrace);
+         dbms_output.put_line ('DBMS_UTILITY.FORMAT_ERROR_BACKTRACE -> ' || dbms_utility.format_error_backtrace);
          dbms_output.put_line ('---------------------------------------------');          
          --
          FOR indx IN 1 .. SQL%BULK_EXCEPTIONS.COUNT LOOP
@@ -84,12 +84,12 @@ BEGIN
             || ': occurred on SQL%BULK_EXCEPTIONS'' sequential index '
             || SQL%BULK_EXCEPTIONS(indx).ERROR_INDEX
             || ' attempting to update name to "'
-            || enames_with_errors(SQL%BULK_EXCEPTIONS (indx).ERROR_INDEX)
+            || enames_with_errors(SQL%BULK_EXCEPTIONS(indx).ERROR_INDEX)
             || '"')
             ;
             --
             dbms_output.put_line ('Oracle error is '
-            || SQLERRM(-1 * SQL%BULK_EXCEPTIONS (indx).ERROR_CODE));
+            || SQLERRM(-1 * SQL%BULK_EXCEPTIONS(indx).ERROR_CODE));
             --
             dbms_output.put_line('----------------------------------------');
         END LOOP;
@@ -97,21 +97,20 @@ BEGIN
          * to leave the table in its original state for next examples 
          */
         ROLLBACK;  
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
- * ------
+ * -----------------------------------------------------------------------------
  * Notes:
- * ------
+ * -----------------------------------------------------------------------------
  * 1) Notice that we multiply the error code in SQL%BULK_EXCEPTIONS by -1 before 
  * passing it to SQLERRM. Here's why we do that:
  *
  * SQLERRM not only returns the current error message. If you pass it an error 
  * code, it returns the error message for that code.
  *
- * But it expects a negative value for all but two error codes 
- * - 0 (no error) and 100 (the ANSI-standard NO_DATA_FOUND error code).
+ * But it expects a negative value for all but two error codes: 
+ * 0 (no error) and 100 (the ANSI-standard NO_DATA_FOUND error code).
  * For reasons that may never be known, the value for the error code stored in 
  * the pseudo-collection is not negative.
  *
@@ -131,6 +130,7 @@ END
  * Exercise 11:
  * -----------------------------------------------------------------------------
  * Change the code you wrote in Exercise 10 as follows:
+ *
  * 1) Expand the number of employee IDs to update to 5.
  * 2) Change the array of salary values so that at least 2 of the updates will 
  * fail.
@@ -149,28 +149,32 @@ DECLARE
     */
    TYPE numbers_nt IS TABLE OF NUMBER;
    --
-   l_ids        numbers_nt := numbers_nt (101, 111, 117, 131, 143);
-   l_salaries   numbers_nt := numbers_nt (10000, 1100000, 12000, 6669999, 5000);
+   l_ids numbers_nt := numbers_nt (101, 111, 117, 131, 143);
+   l_salaries numbers_nt := numbers_nt (10000, 1100000, 12000, 6669999, 5000);
 BEGIN
    --
    dbms_output.put_line('----- Salaries before update -----');
+   --
    FOR JJ IN(SELECT t.* FROM saimk.employees t WHERE t.employee_id in (101, 111, 117, 131, 143) ORDER BY t.employee_id)
    LOOP
-     dbms_output.put_line(jj.employee_id||','||jj.salary);
+     dbms_output.put_line(jj.employee_id || ', ' || jj.salary);
    END LOOP;
+   --
    dbms_output.put_line('----------------------------------');
    --
    FORALL indx IN 1 .. l_ids.COUNT SAVE EXCEPTIONS
       UPDATE saimk.employees t
-      SET t.salary = l_salaries (indx)
-      WHERE t.employee_id = l_ids (indx)
-      ;
+      SET t.salary = l_salaries(indx)
+      WHERE t.employee_id = l_ids(indx)
+   ;
    --
    dbms_output.put_line('----- Salaries after update -----');
+   --
    FOR JJ IN(SELECT t.* FROM saimk.employees t WHERE t.employee_id in (101, 111, 117, 131, 143) ORDER BY t.employee_id)
    LOOP
-     dbms_output.put_line(jj.employee_id||','||jj.salary);
+     dbms_output.put_line(jj.employee_id || ', ' || jj.salary);
    END LOOP;
+   --
    dbms_output.put_line('----------------------------------');
    --   
    dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT);
@@ -184,18 +188,20 @@ BEGIN
          dbms_output.put_line ('#Rows Updated: ' || SQL%ROWCOUNT || ' rows.');  
          --         
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('                            SQLERRM -> '||SQLERRM);
+         dbms_output.put_line ('                            SQLERRM -> ' || SQLERRM);
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('    DBMS_UTILITY.FORMAT_ERROR_STACK -> '||dbms_utility.format_error_stack);         
+         dbms_output.put_line ('    DBMS_UTILITY.FORMAT_ERROR_STACK -> ' || dbms_utility.format_error_stack);         
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('DBMS_UTILITY.FORMAT_ERROR_BACKTRACE -> '||dbms_utility.format_error_backtrace);
+         dbms_output.put_line ('DBMS_UTILITY.FORMAT_ERROR_BACKTRACE -> ' || dbms_utility.format_error_backtrace);
          dbms_output.put_line ('---------------------------------------------');              
          --
          dbms_output.put_line('----- Salaries after update -----');
+         --
          FOR JJ IN(SELECT t.* FROM saimk.employees t WHERE t.employee_id in (101, 111, 117, 131, 143) ORDER BY t.employee_id)
          LOOP
-            dbms_output.put_line(jj.employee_id||','||jj.salary);
+            dbms_output.put_line(jj.employee_id || ', ' || jj.salary);
          END LOOP;
+         --
          dbms_output.put_line('----------------------------------');         
          --
          FOR indx IN 1 .. SQL%BULK_EXCEPTIONS.COUNT LOOP
@@ -203,14 +209,14 @@ BEGIN
                'Error '
             || indx
             || ' - bind array index: '
-            || SQL%BULK_EXCEPTIONS (indx).ERROR_INDEX
+            || SQL%BULK_EXCEPTIONS(indx).ERROR_INDEX
             || ' attempting to update salary to '
-            || l_salaries(SQL%BULK_EXCEPTIONS (indx).ERROR_INDEX))
+            || l_salaries(SQL%BULK_EXCEPTIONS(indx).ERROR_INDEX))
             ;
             --
             dbms_output.put_line (
                'Oracle error is '
-            || SQLERRM(-1 * SQL%BULK_EXCEPTIONS (indx).ERROR_CODE))
+            || SQLERRM(-1 * SQL%BULK_EXCEPTIONS(indx).ERROR_CODE))
             ;
             --
             dbms_output.put_line('----------------------------------------');
@@ -219,6 +225,5 @@ BEGIN
           * to leave the table in its original state for next examples 
           */ 
          ROLLBACK; 
-END
-;
+END;
 /*----------------------------------------------------------------------------*/

@@ -14,12 +14,13 @@
  * 2. Use the bulk processing features of PL/SQL.
  * 
  * If you can change your implementation to avoid a loop and instead simply 
- * execute a single DML statement, that should be done. 
+ * execute a single DML statement, that should be done.
+ *
  * For example, we can do this with the p_increase_salary procedure:
  *
         CREATE OR REPLACE PROCEDURE p_increase_salary (
-           p_department_id_in   IN employees.department_id%TYPE,
-           p_increase_pct_in    IN NUMBER)
+           p_department_id_in IN saimk.employees.department_id%TYPE,
+           p_increase_pct_in IN NUMBER)
         IS
         BEGIN
            UPDATE saimk.employees emp

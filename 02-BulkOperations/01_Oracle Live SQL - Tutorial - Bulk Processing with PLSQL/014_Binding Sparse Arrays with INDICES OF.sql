@@ -28,10 +28,10 @@ BEGIN
    FORALL l_index IN 1 .. l_ids.COUNT
       DELETE 
       FROM saimk.employees t
-      WHERE t.department_id = l_ids (l_index)
-      ;
+      WHERE t.department_id = l_ids(l_index)
+   ;
    --
-   dbms_output.put_line ('#Rows modified = ' || SQL%ROWCOUNT);
+   dbms_output.put_line ('#Rows deleted: ' || SQL%ROWCOUNT);
    /* 
     * to leave the table in its original state for next examples 
     */
@@ -39,21 +39,20 @@ BEGIN
    --
    EXCEPTION
       WHEN OTHERS THEN       
-         dbms_output.put_line ('Rows modified = ' || SQL%ROWCOUNT);
+         dbms_output.put_line ('#Rows deleted: ' || SQL%ROWCOUNT);
          --         
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('                            SQLERRM -> '||SQLERRM);
+         dbms_output.put_line ('                            SQLERRM -> ' || SQLERRM);
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('    DBMS_UTILITY.FORMAT_ERROR_STACK -> '||dbms_utility.format_error_stack);         
+         dbms_output.put_line ('    DBMS_UTILITY.FORMAT_ERROR_STACK -> ' || dbms_utility.format_error_stack);         
          dbms_output.put_line ('---------------------------------------------');
-         dbms_output.put_line ('DBMS_UTILITY.FORMAT_ERROR_BACKTRACE -> '||dbms_utility.format_error_backtrace);
+         dbms_output.put_line ('DBMS_UTILITY.FORMAT_ERROR_BACKTRACE -> ' || dbms_utility.format_error_backtrace);
          dbms_output.put_line ('---------------------------------------------');   
          /* 
           * to leave the table in its original state for next examples 
           */         
          ROLLBACK;
-END
-;
+END;
 /*
  * How do you get around this problem? Certainly, you could "densify" your 
  * collection before binding it to FORALL. And prior to 10.2 you would have had 
@@ -97,15 +96,14 @@ BEGIN
       UPDATE saimk.employees t
       SET t.salary = 10000  
       WHERE t.employee_id = l_employees(l_index)
-      ;  
+   ;  
    --
-   dbms_output.put_line ('#Rows modified = ' || SQL%ROWCOUNT);
+   dbms_output.put_line ('#Rows updated: ' || SQL%ROWCOUNT);
    /* 
     * to leave the table in its original state for next examples 
     */   
    ROLLBACK; 
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * -----------------------------------------------------------------------------
@@ -144,9 +142,9 @@ BEGIN
       UPDATE saimk.employees t
       SET t.salary = 10001
       WHERE t.employee_id = l_employees (l_index)
-      ;
+   ;
    --
-   dbms_output.put_line ('#Rows modified = ' || SQL%ROWCOUNT);
+   dbms_output.put_line ('#Rows updated: ' || SQL%ROWCOUNT);
    --
    FOR rec IN (SELECT t.employee_id
                FROM saimk.employees t
@@ -156,8 +154,7 @@ BEGIN
    END LOOP;
    -- 
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /* 
  * -----------------------------------------------------------------------------
@@ -255,12 +252,12 @@ DECLARE
   --
   PROCEDURE p_test_update_emps(p_run_type IN VARCHAR2 DEFAULT 'DEFAULT')
   IS
-    l_ids   numbers_t := numbers_t(111, 121, 132);
+    l_ids numbers_t := numbers_t(111, 121, 132);
   BEGIN
      BEGIN
         /* 
          * This is OK: No errors occur whether p_run_type is DEFAULT or 
-         * INDICESOF and the bind array is dense or sparse
+         * INDICESOF as the bind array is dense
          */
         p_update_emps (l_ids, p_run_type);
         --
@@ -314,8 +311,7 @@ BEGIN
    p_test_update_emps('DEFAULT');
    dbms_output.put_line ('--------------------------------------------------');
    p_test_update_emps('INDICESOF');
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * -----------------------------------------------------------------------------
@@ -352,12 +348,12 @@ END
 DECLARE
    TYPE employee_aat IS TABLE OF saimk.employees%ROWTYPE INDEX BY PLS_INTEGER;
    -- this is for the employees bind array
-   l_employees   employee_aat;
+   l_employees employee_aat;
    --
    TYPE index_aat IS TABLE OF BOOLEAN INDEX BY PLS_INTEGER;
    --
-   l_indices1    index_aat;
-   l_indices2    index_aat;
+   l_indices1 index_aat;
+   l_indices2 index_aat;
 BEGIN
    SELECT t.*
    BULK COLLECT 
@@ -371,16 +367,16 @@ BEGIN
    dbms_output.put_line ('--------------------------------------------------');
    --
    FOR indx IN 1 .. l_employees.COUNT LOOP
-      IF l_employees (indx).salary = 2600
+      IF l_employees(indx).salary = 2600
       THEN
-         l_indices1 (indx) := NULL;
-         dbms_output.put_line ('INDEX ' || indx || '---->' || 'EMPLOYEE ID ' || l_employees (indx).employee_id || ' has salary 2600');
+         l_indices1(indx) := NULL;
+         dbms_output.put_line ('INDEX ' || indx || '---->' || 'EMPLOYEE ID ' || l_employees(indx).employee_id || ' has salary 2600');
       END IF;
       --
       IF TO_CHAR (l_employees (indx).hire_date, 'YYYY') = '2004'
       THEN
-         l_indices2 (indx) := NULL;
-         dbms_output.put_line ('INDEX ' || indx || '---->' || 'EMPLOYEE ID ' || l_employees (indx).employee_id || ' hired in 2004');
+         l_indices2(indx) := NULL;
+         dbms_output.put_line ('INDEX ' || indx || '---->' || 'EMPLOYEE ID ' || l_employees(indx).employee_id || ' hired in 2004');
       END IF;
       --
    END LOOP;
@@ -391,13 +387,13 @@ BEGIN
       UPDATE saimk.employees t
       SET t.salary = 2626
       WHERE t.employee_id = l_employees(indx).employee_id
-      ;
+   ;
    --
    FORALL indx IN INDICES OF l_indices2
       UPDATE saimk.employees t
       SET t.hire_date = TO_DATE ('2014-01-01','YYYY-MM-DD')
       WHERE t.employee_id = l_employees(indx).employee_id
-      ;
+   ;
    --
    dbms_output.put_line ('--------------------------------------------------');
    dbms_output.put_line ('*** After changes:');
@@ -422,6 +418,5 @@ BEGIN
    dbms_output.put_line ('--------------------------------------------------');
    --
    ROLLBACK;
-END
-;
-/*----------------------------------------------------------------------------*/
+END;
+/*----------------------------------------------------------------------------/

@@ -61,15 +61,14 @@ BEGIN
       DELETE 
       FROM saimk.employees t
       WHERE t.department_id = l_ids(l_index)
-      ;
+   ;
    --
    dbms_output.put_line ('#Rows deleted: ' || SQL%ROWCOUNT);
    /* 
     * to leave the table in its original state for next examples 
     */
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * Here's what we modified to convert to bulk processing:
@@ -110,30 +109,30 @@ END
  */
 DECLARE
    /* We use pre-defined collection types to reduce code volume. */
-   l_ids        dbms_sql.number_table;
-   l_names      dbms_sql.varchar2a;
-   l_salaries   dbms_sql.number_table;
+   l_ids dbms_sql.number_table;
+   l_names dbms_sql.varchar2a;
+   l_salaries dbms_sql.number_table;
 BEGIN
-   l_ids (1) := 101;
-   l_ids (2) := 112;
-   l_ids (3) := 120;
+   l_ids(1) := 101;
+   l_ids(2) := 112;
+   l_ids(3) := 120;
    --
-   l_names (1) := 'Sneezy';
-   l_names (2) := 'Bashful';
-   l_names (3) := 'Happy';
+   l_names(1) := 'Sneezy';
+   l_names(2) := 'Bashful';
+   l_names(3) := 'Happy';
    --
-   l_salaries (1) := 1000;
-   l_salaries (2) := 1500;
-   l_salaries (3) := 2000;
+   l_salaries(1) := 1000;
+   l_salaries(2) := 1500;
+   l_salaries(3) := 2000;
    --
    FORALL indx IN 1 .. l_ids.COUNT
       UPDATE saimk.employees t
-      SET t.first_name = l_names (indx), 
-          t.salary = l_salaries (indx)
-      WHERE t.employee_id = l_ids (indx)
-      ;
+      SET t.first_name = l_names(indx), 
+          t.salary = l_salaries(indx)
+      WHERE t.employee_id = l_ids(indx)
+   ;
    --
-   dbms_output.put_line('#Rows updated:' || SQL%ROWCOUNT);
+   dbms_output.put_line('#Rows updated: ' || SQL%ROWCOUNT);
    --
    FOR emp_rec IN (  SELECT first_name, salary
                      FROM saimk.employees t
@@ -147,8 +146,7 @@ BEGIN
     * to leave the table in its original state for next examples 
     */
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
 /*
  * -----------------------------------------------------------------------------
@@ -159,27 +157,27 @@ END
  * -----------------------------------------------------------------------------  
  */
 DECLARE
-   l_ids        dbms_sql.number_table;
-   l_names      dbms_sql.varchar2a;
-   l_salaries   dbms_sql.number_table;
+   l_ids dbms_sql.number_table;
+   l_names dbms_sql.varchar2a;
+   l_salaries dbms_sql.number_table;
 BEGIN
-   l_ids (1) := 101;
-   l_ids (2) := 112;
-   l_ids (3) := 120;
+   l_ids(1) := 101;
+   l_ids(2) := 112;
+   l_ids(3) := 120;
    --
-   l_names (1) := 'Sneezy';
-   l_names (100) := 'Happy';
+   l_names(1) := 'Sneezy';
+   l_names(100) := 'Happy';
    --
-   l_salaries (1) := 1000;
-   l_salaries (200) := 1500;
-   l_salaries (3) := 2000;
+   l_salaries(1) := 1000;
+   l_salaries(200) := 1500;
+   l_salaries(3) := 2000;
    --
    FORALL indx IN 1 .. l_ids.COUNT
       UPDATE saimk.employees t
-      SET t.first_name = l_names (indx), 
-          t.salary = l_salaries (indx)
-      WHERE t.employee_id = l_ids (indx)
-      ;
+      SET t.first_name = l_names(indx), 
+          t.salary = l_salaries(indx)
+      WHERE t.employee_id = l_ids(indx)
+   ;
    /* 
     * to leave the table in its original state for next examples 
     */
@@ -188,15 +186,14 @@ BEGIN
    EXCEPTION
      WHEN OTHERS THEN
        --
-       dbms_output.put_line('#Rows updated:' || SQL%ROWCOUNT);        
+       dbms_output.put_line('#Rows updated: ' || SQL%ROWCOUNT);        
        /* 
         * to leave the table in its original state for next examples 
         */ 
        ROLLBACK;
        --
        RAISE;
-END
-;
+END;
 /*
  * ORA-22160: element at index [N] does not exist
  * So: by all means, you can reference multiple bind arrays, but make sure they 
@@ -247,11 +244,11 @@ END
 DECLARE
    TYPE ids_t IS TABLE OF saimk.employees.employee_id%TYPE;
    --
-   l_ids     ids_t;
+   l_ids ids_t;
    --
    TYPE names_t IS TABLE OF saimk.employees.last_name%TYPE;
    --
-   l_names   names_t;
+   l_names names_t;
 BEGIN
    SELECT t.employee_id, t.last_name
    BULK COLLECT 
@@ -262,17 +259,27 @@ BEGIN
    --
    FORALL indx IN 1 .. l_ids.COUNT
       UPDATE saimk.employees t
-      SET t.last_name = UPPER (l_names (indx))
-      WHERE t.employee_id = l_ids (indx)
-      ;
+      SET t.last_name = UPPER(l_names(indx))
+      WHERE t.employee_id = l_ids(indx)
+   ;
    --
    FOR indx IN 1..l_names.COUNT LOOP
-     dbms_output.put_line(l_ids(indx)||') '||l_names(indx));
+     dbms_output.put_line(indx || ') ' || l_ids(indx)||', '||l_names(indx));
    END LOOP;
+   --
+   dbms_output.put_line('----------------------------------------------------');
+   dbms_output.put_line('New Last Name List');
+   dbms_output.put_line('----------------------------------------------------');
+   --
+   FOR jj IN ( SELECT t.employee_id, t.last_name
+                 FROM saimk.employees t
+                 ORDER BY t.employee_id
+   ) LOOP
+     dbms_output.put_line(jj.last_name);
+   END LOOP;   
    /* 
     * to leave the table in its original state for next examples 
     */
    ROLLBACK;
-END
-;
+END;
 /*----------------------------------------------------------------------------*/
