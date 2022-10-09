@@ -27,6 +27,7 @@ IS
       --
    BEGIN
       /*
+       * Function to return GCD of a and b
        * -----------------------------------------------------------------------
        * For a detailled explanation and proof please visit:
        * https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/the-euclidean-algorithm#:~:text=The%20Euclidean%20Algorithm%20for%20finding,%3D%20B%E2%8B%85Q%20%2B%20R)
@@ -41,8 +42,8 @@ IS
        * inter-remainder value, and the first parameter holds the previous value 
        * of the second parameter. 
        *
-       * When the second parameter to the GCD function gets 0, it is the
-       * stopping point for the iteration.
+       * When the 2nd parameter to the GCD function gets 0, it is the
+       * stopping point for the iteration, and the result is the 1st parameter.
        * -----------------------------------------------------------------------
        * Notes:
        * -----------------------------------------------------------------------
