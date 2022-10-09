@@ -22,25 +22,24 @@ IS
    BEGIN
       /*
        * -----------------------------------------------------------------------
-       * For a detailled explanation and proo please visit:
+       * For a detailled explanation and proof please visit:
        * https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/the-euclidean-algorithm#:~:text=The%20Euclidean%20Algorithm%20for%20finding,%3D%20B%E2%8B%85Q%20%2B%20R)
        * -----------------------------------------------------------------------
-       * The idea of this algorithm depends on the Euclid Algorithm. To find the 
-       * GCD of 2 integers we can evaluate the GCD of the absolutely smaller 
-       * number(as 1st parameter to GCD function) and the result of the mod 
-       * operation of the absolutely bigger number and the absolutely smaller 
-       * number (as 2nd parameter to GCD function) with an iteration. 
+       * The idea of this algorithm depends on the Euclid Algorithm. To find  
+       * GCD(A, B), we can evaluate GCD(B, A mod B) with an iteration. 
        *
        * That is, 
-       * to find GCD(15, 6) we can estimate GCD(6, 15 mod 6) = GCD(6, 3). 
-       * And now,to Find GCD(6, 3) we can estimate GCD(3, 6 mod 3) = GCD(3, 0). 
-       * After the 1st step in the iteration the second parameter holds the 
+       * to find GCD(15, 6) we can evaluate GCD(6, 15 mod 6) = GCD(6, 3). And 
+       * now,to find GCD(6, 3) we can evaluate GCD(3, 6 mod 3) = GCD(3, 0). 
+       * After each step of the iteration the second parameter holds the 
        * inter-remainder value, and the first parameter holds the previous value 
        * of the second parameter. 
        *
        * When the second parameter to the GCD function gets 0, it is the
-       * stopping point.
-       *
+       * stopping point for the iteration.
+       * -----------------------------------------------------------------------
+       * Notes:
+       * -----------------------------------------------------------------------
        * 1. If ABS(l_a) < ABS(l_b), l_remainder :=  MOD(l_a, l_b) will be l_a, 
        * otherwise it will be the remainder of the l_a / l_b division.
        * 
@@ -50,20 +49,64 @@ IS
        * parameter will always be holding the remainder of internal mod 
        * operations.
        *
+       * -----------------------------------------------------------------------
+       * Proof that the Euclidean Algorithm Works
+       * -----------------------------------------------------------------------       
+         Recall this definition: 
+         -----------------------
+         When a and b are integers and a != 0 we say a divides b, and write a|b, 
+         if b/a is an integer.
+         -----------------------
+         1. Use the definition to prove that if a, b, c, x and y are integers 
+         and a|b and a|c, then a|(bx + cy).
+         -------
+         Answer:
+         -------
+         We are given that the two quotients b/a and c/a are integers.
+         Therefore the integer linear combination 
+         (b/a) × x + (c/a) × y = (bx + cy)/a is an integer, which means that 
+         a|(bx + cy).
+         -------
+         2. Use (1) to prove that if a is a positive integer and b, q and r are
+         integers with b = aq + r, then gcd(b, a) = gcd(a, r).
+         -------
+         Answer:
+         -------
+         Write m = gcd(b, a) and n = gcd(a, r). Since m divides both b 
+         and a, it must also divide r = b−aq by (1). This shows that m is a 
+         common divisor of a and r, so it must be ≤ n, their greatest common 
+         divisor. Likewise, since n divides both a and r, it must divide 
+         b = aq +r by (1), so n ≤ m.
+         
+         Since m ≤ n and n ≤ m, we have m = n.
+         -------------------
+         Alternative answer: 
+         -------------------
+         Let c be a common divisor of b and a. Then by (1), c must divide 
+         r = b − aq. Thus, the set D of common divisors of b and a is a subset 
+         of the set E of common divisors of a and r. 
+         
+         Now let d be a common divisor of a and r. Then by (1), d must divide 
+         b = aq + r. Thus, the set E of common divisors of a and r is a subset 
+         of the set D of common divisors of b and a. 
+         
+         Hence D = E and the largest integer in this set is both gcd(b, a) and
+         gcd(a, r). Therefore gcd(b, a) = gcd(a, r).       
+       * -----------------------------------------------------------------------
        */
       /* -----------------------------------------------------------------------
        * SAMPLE OUTPUT
        * -----------------------------------------------------------------------
          ---------------------- GCD ----------------------
          l_a		l_b		l_remainder
-         15		6		
+         15			6		
          -------------------------------------------------
          Starting GCD LOOP..
          l_a		l_b		l_remainder		Step#
          -------------------------------------------------
-         15		6		3				1
-         6		3		0				2
-         3		0		0				3
+         15			6		3				1
+         6			3		0				2
+         3			0		0				3
          -------------------------------------------------
          GCD(15, 6) = 3
        * -----------------------------------------------------------------------
