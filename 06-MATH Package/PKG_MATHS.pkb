@@ -18,7 +18,6 @@ IS
     */   
    FUNCTION f_get_gcd(p_a INTEGER, p_b INTEGER, p_print_msg BOOLEAN DEFAULT FALSE) RETURN INTEGER
    IS
-      l_result INTEGER := 0;
       l_remainder INTEGER;
       --
       l_a INTEGER := p_a;
