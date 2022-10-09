@@ -1,6 +1,8 @@
 CREATE OR REPLACE PACKAGE BODY saimk.pkg_maths 
 IS
    --
+   GC_TAB CONSTANT VARCHAR2(10) := CHR(9);
+   --
    PROCEDURE p_print(p_msg VARCHAR2, p_print_msg BOOLEAN DEFAULT FALSE)
    IS
    BEGIN
@@ -116,18 +118,18 @@ IS
    BEGIN
       --
       p_print('---------------------- GCD ----------------------', p_print_msg);
-      p_print('l_a'||chr(9)||chr(9)||'l_b'||chr(9)||chr(9)||'l_remainder', p_print_msg);
-      p_print(l_a||chr(9)||chr(9)||l_b||chr(9)||chr(9)||l_remainder, p_print_msg);
+      p_print('l_a'||GC_TAB||GC_TAB||'l_b'||GC_TAB||GC_TAB||'l_remainder', p_print_msg);
+      p_print(l_a||GC_TAB||GC_TAB||l_b||GC_TAB||GC_TAB||l_remainder, p_print_msg);
       --
       p_print('-------------------------------------------------', p_print_msg);
       p_print('Starting GCD LOOP..', p_print_msg);
-      p_print('l_a'||chr(9)||chr(9)||'l_b'||chr(9)||chr(9)||'l_remainder'||chr(9)||chr(9)||'Step#', p_print_msg);      
+      p_print('l_a'||GC_TAB||GC_TAB||'l_b'||GC_TAB||GC_TAB||'l_remainder'||GC_TAB||GC_TAB||'Step#', p_print_msg);      
       p_print('-------------------------------------------------', p_print_msg);
       --
       WHILE l_b != 0 LOOP
          l_remainder := MOD(l_a, l_b);
          --
-         p_print(l_a||chr(9)||chr(9)||l_b||chr(9)||chr(9)||l_remainder||chr(9)||chr(9)||chr(9)||chr(9)||l_step, p_print_msg);      
+         p_print(l_a||GC_TAB||GC_TAB||l_b||GC_TAB||GC_TAB||l_remainder||GC_TAB||GC_TAB||l_step, p_print_msg);      
          --
          l_a := l_b;
          l_b := l_remainder;
@@ -135,7 +137,7 @@ IS
          l_step := l_step + 1;
       END LOOP;
       --
-      p_print(l_a||chr(9)||chr(9)||l_b||chr(9)||chr(9)||l_remainder||chr(9)||chr(9)||chr(9)||chr(9)||l_step, p_print_msg);
+      p_print(l_a||GC_TAB||GC_TAB||l_b||GC_TAB||GC_TAB||l_remainder||GC_TAB||GC_TAB||l_step, p_print_msg);
       p_print('-------------------------------------------------', p_print_msg);
       --
       RETURN ABS(l_a);
